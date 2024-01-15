@@ -3,7 +3,8 @@
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
-  before_action :set_blog, only: %i[show edit update destroy]
+  before_action :set_blog, only: %i[show]
+  before_action :set_current_user_blog, only: %i[edit update destroy]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -45,6 +46,12 @@ class BlogsController < ApplicationController
 
   def set_blog
     @blog = Blog.find(params[:id])
+  end
+
+  def set_current_user_blog
+    @blog = current_user.blogs.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to blog_url(params[:id]), alert: 'Permission denied for this blog.'
   end
 
   def blog_params
