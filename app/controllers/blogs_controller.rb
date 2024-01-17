@@ -14,9 +14,7 @@ class BlogsController < ApplicationController
   end
 
   def show
-    return if !@blog.secret? || @blog.user == current_user
-
-    redirect_to blogs_url, alert: 'Blog not found.'
+    raise ActiveRecord::RecordNotFound if @blog.secret? && @blog.user != current_user
   end
 
   def new
@@ -53,14 +51,10 @@ class BlogsController < ApplicationController
 
   def set_blog
     @blog = Blog.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    redirect_to blogs_url, alert: 'Blog not found.'
   end
 
   def set_current_user_blog
     @blog = current_user.blogs.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    redirect_to blog_url(params[:id]), alert: 'Permission denied for this blog.'
   end
 
   def sanitize_blog_content
