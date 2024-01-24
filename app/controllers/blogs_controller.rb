@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
 class BlogsController < ApplicationController
-  include ActionView::Helpers::SanitizeHelper
-
   skip_before_action :authenticate_user!, only: %i[index show]
 
   before_action :set_current_user_blog, only: %i[edit update destroy]
-  before_action :sanitize_blog_content, only: %i[create update]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -51,11 +48,6 @@ class BlogsController < ApplicationController
 
   def set_current_user_blog
     @blog = current_user.blogs.find(params[:id])
-  end
-
-  def sanitize_blog_content
-    tags = %w[a acronym b strong i em li ul ol h1 h2 h3 h4 h5 h6 blockquote br cite sub sup ins p]
-    blog_params[:content] = sanitize(blog_params[:content], tags:, attributes: %w[href title])
   end
 
   def blog_params
