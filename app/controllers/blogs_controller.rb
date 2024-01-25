@@ -10,8 +10,7 @@ class BlogsController < ApplicationController
   end
 
   def show
-    @blog = Blog.find_by(id: params[:id], secret: false) ||
-            Blog.find_by!(id: params[:id], secret: true, user: current_user)
+    @blog = Blog.where('secret = ? or user_id = ?', false, current_user&.id).find(params[:id])
   end
 
   def new
